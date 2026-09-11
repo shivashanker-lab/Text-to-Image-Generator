@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Environment / secrets
+.env
+.env.*
+
+# Large datasets
+data/raw/
+data/processed/
+
+# Large trained models
+models/
+
+# Generated outputs
+outputs/generated_images/
+outputs/graphs/
+outputs/comparisons/
+
+# Temporary files
+*.tmp
+*.temp
+
+# OS files
+.DS_Store
+Thumbs.db
