@@ -20,7 +20,7 @@ data/raw/
 data/processed/
 
 # Large trained models
-models/
+/models/
 
 # Generated outputs
 outputs/generated_images/
