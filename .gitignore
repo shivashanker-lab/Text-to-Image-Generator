@@ -20,7 +20,8 @@ data/raw/
 data/processed/
 
 # Large trained models
-/models/
+/models/*
+!/models/README.md
 
 # Generated outputs
 outputs/generated_images/
