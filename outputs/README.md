@@ -29,3 +29,21 @@ The attention-weight tensor has shape `[8, 16, 5]`.
 The current local checkout does not contain generated image files in this directory because several experiments were executed in notebook or Colab runtimes and their runtime-generated image files were not retained in this repository checkout.
 
 The notebooks contain the code used to generate and verify those images.
+
+## Task 1 Runtime Artifacts
+
+The Task 1 notebook references the following generated artifacts:
+
+- `outputs/task1/baseline/baseline_1.png`
+- `outputs/task1/baseline/baseline_2.png`
+- `outputs/task1/baseline/baseline_3.png`
+- `outputs/task1/adapted/adapted_1.png`
+- `outputs/task1/adapted/adapted_2.png`
+- `outputs/task1/adapted/adapted_3.png`
+- `outputs/task1/training/training_loss.png`
+- `outputs/task1/comparison/baseline_vs_adapted_comparison.png`
+- `outputs/task1/lora_custom_dataset/pytorch_lora_weights.safetensors`
+
+These artifacts were generated and verified during the completed Task 1 notebook run, but the runtime output directory is not present in the current local repository checkout.
+
+No placeholder or fabricated files are included. The notebook contains the code required to regenerate and verify these artifacts.
