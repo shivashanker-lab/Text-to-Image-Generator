@@ -9,7 +9,7 @@ This project explores the complete workflow of generating images from textual de
 ## Internship Tasks
 
 1. **Pretrained Model + Custom Dataset**  
-   Refine a pretrained text-to-image model using a domain-specific dataset.
+   Refine a pretrained text-to-image model using a custom-curated subset of the Flickr8k image-caption dataset.
 
 2. **Conditional GAN (CGAN)**  
    Generate images based on textual labels or categories.
@@ -37,3 +37,19 @@ Text-to-Image-Generator/
 ├── outputs/
 ├── app/
 └── reports/
+
+## Integrated Text-to-Image Pipeline
+
+The final integrated pipeline connects text preprocessing, BERT-based text embeddings, and a text-conditioned GAN.
+
+Text Description
+        |
+Text Preprocessing
+        |
+BERT Tokenization
+        |
+768-D BERT Embedding
+        |
+Text-Conditioned GAN
+        |
+Generated Image
