@@ -1,10 +1,10 @@
 # Experiment Outputs
 
-This directory contains selected artifacts produced by the project experiments.
+This directory contains saved experiment results, generated images, and model artifacts.
 
-## Comparisons
+## GAN Comparisons
 
-`outputs/comparisons/` contains saved results from the baseline GAN and the attention-conditioned GAN experiment:
+The `comparisons/` directory preserves baseline and attention-based GAN results:
 
 - `baseline_generator_losses.npy`
 - `baseline_discriminator_losses.npy`
@@ -14,36 +14,33 @@ This directory contains selected artifacts produced by the project experiments.
 - `attention_gan_samples.pt`
 - `attention_weights.pt`
 
-The saved GAN sample tensors have shape `[8, 1, 64, 64]`.
+The loss arrays record five values per experiment. The sample tensors and attention weights are retained for inspection and reproducibility.
 
-The attention-weight tensor has shape `[8, 16, 5]`.
+## Dataset Analysis
 
-## Graphs and Analysis
-
-`outputs/graphs/flickr8k_analysis_results.csv` contains the summarized Flickr8k dataset-analysis metrics.
+`graphs/flickr8k_analysis_results.csv` contains summarized Flickr8k dataset statistics, including image counts, caption statistics, and image dimensions.
 
 ## Generated Images
 
-`outputs/generated_images/` is reserved for generated image outputs.
+The `generated_images/` directory contains these validated showcase images:
 
-The current local checkout does not contain generated image files in this directory because several experiments were executed in notebook or Colab runtimes and their runtime-generated image files were not retained in this repository checkout.
+- `realistic_studio.png`
+- `internship_finetuned.png`
 
-The notebooks contain the code used to generate and verify those images.
+## Task 1: Stable Diffusion and LoRA
 
-## Task 1 Runtime Artifacts
+The `task1/` directory contains:
 
-The Task 1 notebook references the following generated artifacts:
+- `baseline/baseline_1.png`, `baseline/baseline_2.png`, and `baseline/baseline_3.png`
+- `adapted/adapted_1.png`, `adapted/adapted_2.png`, and `adapted/adapted_3.png`
+- `comparison/baseline_vs_adapted_comparison.png`
+- `training/training_loss.png`
+- `lora_custom_dataset/pytorch_lora_weights.safetensors`
 
-- `outputs/task1/baseline/baseline_1.png`
-- `outputs/task1/baseline/baseline_2.png`
-- `outputs/task1/baseline/baseline_3.png`
-- `outputs/task1/adapted/adapted_1.png`
-- `outputs/task1/adapted/adapted_2.png`
-- `outputs/task1/adapted/adapted_3.png`
-- `outputs/task1/training/training_loss.png`
-- `outputs/task1/comparison/baseline_vs_adapted_comparison.png`
-- `outputs/task1/lora_custom_dataset/pytorch_lora_weights.safetensors`
+The consolidated comparison board presents all three baseline/adapted pairs and their amplified pixel differences.
 
-These artifacts were generated and verified during the completed Task 1 notebook run, but the runtime output directory is not present in the current local repository checkout.
+The baseline and adapted outputs are not pixel-identical. However, a pixel difference alone does not establish that fine-tuning improved visual quality. Pair 2 also used slightly different prompts, so that pair is not a fully controlled comparison.
 
-No placeholder or fabricated files are included. The notebook contains the code required to regenerate and verify these artifacts.
+## Reproducibility
+
+The project's numbered notebooks contain the associated experiments and code. They are retained unchanged, as requested.

@@ -11,27 +11,32 @@ venv/
 .venv/
 env/
 
-# Environment / secrets
+# Environment variables and secrets
 .env
 .env.*
 
-# Large datasets
-data/raw/
-data/processed/
+# Dataset files: keep the actual dataset outside GitHub
+/data/raw/
+/data/processed/
 
-# Large trained models
+# Pretrained base models stay in the external model cache
 /models/*
 !/models/README.md
-
-# Generated outputs
-outputs/generated_images/
-outputs/graphs/
-outputs/comparisons/
+!/models/cgan/
+/models/cgan/*
+!/models/cgan/task6_text_conditioned_generator.pth
+!/models/cgan/task6_text_conditioned_discriminator.pth
+!/models/cgan/task6_text_embeddings.pt
+!/models/cgan/task6_generator_losses.npy
+!/models/cgan/task6_discriminator_losses.npy
 
 # Temporary files
 *.tmp
 *.temp
 
-# OS files
+# Local verification backups
+*.phase9-backup
+
+# Operating system files
 .DS_Store
 Thumbs.db

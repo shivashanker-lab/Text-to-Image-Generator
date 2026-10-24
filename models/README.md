@@ -1,34 +1,27 @@
 # Model Artifacts
 
-## Repository Model Folders
+This directory contains saved Conditional GAN artifacts from the internship project.
 
-- `models/cgan/` — reserved for conditional GAN checkpoints.
-- `models/pretrained/` — reserved for pretrained or adapted model artifacts.
+## Conditional GAN Artifacts
 
-Large model files are not committed to this repository.
+The `models/cgan/` directory contains:
 
-## Task 1: Stable Diffusion LoRA
+- `task6_text_conditioned_generator.pth` - trained generator checkpoint.
+- `task6_text_conditioned_discriminator.pth` - trained discriminator checkpoint.
+- `task6_text_embeddings.pt` - saved text embeddings associated with the research pipeline.
+- `task6_generator_losses.npy` - saved generator training-loss values.
+- `task6_discriminator_losses.npy` - saved discriminator training-loss values.
 
-The Task 1 notebook saves the trained LoRA weights as:
+The existing Streamlit application uses the configured GAN artifacts for its Research Lab mode. The discriminator checkpoint and loss files are retained as research and training artifacts.
+
+## Stable Diffusion LoRA
+
+The internship fine-tuning weights are stored at:
 
 `outputs/task1/lora_custom_dataset/pytorch_lora_weights.safetensors`
 
-The completed training notebook verified that the weights were saved and successfully reloaded into a fresh Stable Diffusion pipeline. The trained LoRA file is not currently present in this local repository checkout.
+The application references this artifact for Internship Fine-Tuned mode.
 
-## Task 6: Integrated Text-to-Image Pipeline
+## Pretrained Base Models
 
-The Task 6 notebook saves:
-
-- `task6_text_conditioned_generator.pth`
-- `task6_text_conditioned_discriminator.pth`
-- `task6_text_embeddings.pt`
-
-These were generated in the notebook runtime under:
-
-`/content/text_to_image_task6/`
-
-They are not currently stored in this repository checkout.
-
-## Storage Strategy
-
-Large model checkpoints are kept outside GitHub to avoid committing large binary artifacts. The notebooks contain the code required to create, save, reload, and verify the trained model artifacts.
+The complete pretrained Stable Diffusion and BERT weights are not stored in this directory. The application loads models through their configured model identifiers and the Hugging Face model-loading system.

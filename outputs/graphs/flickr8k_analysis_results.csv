@@ -1,0 +1,22 @@
+Metric,Value
+Training images,6000.0
+Development images,1000.0
+Test images,1000.0
+Total images,8000.0
+Captions per image,5.0
+Training captions analyzed,30000.0
+Average caption length,11.7818
+Minimum caption length,2.0
+Maximum caption length,38.0
+Median caption length,11.0
+Unique words,7705.0
+Minimum image width,164.0
+Maximum image width,500.0
+Average image width,457.88216666666665
+Minimum image height,127.0
+Maximum image height,500.0
+Average image height,397.36966666666666
+Average aspect ratio,1.2196341119769027
+Minimum aspect ratio,0.328
+Maximum aspect ratio,3.937007874015748
+Median aspect ratio,1.3333333333333333

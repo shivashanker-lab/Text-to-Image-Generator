@@ -51,14 +51,20 @@ def generate_text_embedding(
     """
     Generate a pooled BERT embedding for a text description.
 
+    The tokenized inputs are automatically moved to the same
+    device as the text encoder, allowing both CPU and CUDA use.
+
     Parameters
     ----------
     text : str
         Input text description.
+
     tokenizer : transformers tokenizer
         Tokenizer associated with the text encoder.
+
     model : transformers model
         BERT text encoder.
+
     max_length : int, default=32
         Maximum token sequence length.
 
@@ -77,13 +83,30 @@ def generate_text_embedding(
         max_length=max_length,
     )
 
+    device = next(model.parameters()).device
+
+    inputs = {
+        key: value.to(device)
+        for key, value in inputs.items()
+    }
+
     with torch.no_grad():
         outputs = model(**inputs)
 
     attention_mask = inputs["attention_mask"].unsqueeze(-1)
-    masked_embeddings = outputs.last_hidden_state * attention_mask
+
+    masked_embeddings = (
+        outputs.last_hidden_state * attention_mask
+    )
+
     summed_embeddings = masked_embeddings.sum(dim=1)
-    token_counts = attention_mask.sum(dim=1).clamp(min=1)
-    pooled_embedding = summed_embeddings / token_counts
+
+    token_counts = (
+        attention_mask.sum(dim=1).clamp(min=1)
+    )
+
+    pooled_embedding = (
+        summed_embeddings / token_counts
+    )
 
     return pooled_embedding
