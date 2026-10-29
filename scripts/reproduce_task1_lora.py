@@ -1,5 +1,7 @@
 from pathlib import Path
 import gc
+import csv
+import re
 
 import matplotlib.pyplot as plt
 import torch
@@ -58,6 +60,11 @@ ADAPTER_NAME = "custom_dataset_adapter"
 device = "cuda" if torch.cuda.is_available() else "cpu"
 dtype = torch.float16 if device == "cuda" else torch.float32
 
+SEED = 42
+torch.manual_seed(SEED)
+if device == "cuda":
+    torch.cuda.manual_seed_all(SEED)
+
 if device == "cuda":
     torch.backends.cuda.matmul.allow_tf32 = True
 
@@ -92,41 +99,99 @@ print("=" * 70)
 
 print("\n===== LOADING FLICKR8K =====")
 
+
+ANIMAL_KEYWORDS = (
+    "dog", "dogs", "puppy", "puppies", "cat", "cats",
+    "kitten", "kittens", "horse", "horses", "bird", "birds",
+    "cow", "cows", "sheep", "zebra", "zebras", "giraffe",
+    "giraffes", "elephant", "elephants", "monkey", "monkeys",
+    "animal", "animals", "pet", "pets", "lion", "lions",
+    "tiger", "tigers", "deer", "bear", "bears", "duck",
+    "ducks", "goat", "goats", "pig", "pigs", "rabbit", "rabbits",
+)
+
+print("\n===== LOADING CURATED FLICKR8K ANIMAL SUBSET =====")
+
 dataset = load_dataset(
     DATASET_ID,
     split="train",
     streaming=True,
 )
 
+# A fixed shuffle seed avoids always taking the earliest matching records.
+dataset_stream = iter(dataset.shuffle(seed=SEED, buffer_size=256))
+
 training_images = []
 training_captions = []
+training_file_names = []
+scanned_rows = 0
 
-dataset_stream = iter(dataset)
+for sample in dataset_stream:
+    scanned_rows += 1
 
-for index in range(NUM_SAMPLES):
+    candidates = [
+        str(sample.get(f"caption_{i}", "") or "").strip()
+        for i in range(5)
+    ]
 
-    sample = next(dataset_stream)
+    matched_caption = None
+    for candidate in candidates:
+        lower_caption = candidate.lower()
+        if any(
+            re.search(rf"\b{re.escape(word)}\b", lower_caption)
+            for word in ANIMAL_KEYWORDS
+        ):
+            matched_caption = candidate
+            break
+
+    if matched_caption is None:
+        continue
 
     image = sample["image"].convert("RGB")
-    caption = sample["caption_0"].strip()
+    file_name = sample.get("file_name") or f"stream-row-{scanned_rows:05d}"
 
     training_images.append(image)
-    training_captions.append(caption)
+    training_captions.append(matched_caption)
+    training_file_names.append(str(file_name))
 
-    if (index + 1) % 10 == 0:
-        print(f"Loaded {index + 1}/{NUM_SAMPLES}")
+    if len(training_images) % 10 == 0:
+        print(f"Selected {len(training_images)}/{NUM_SAMPLES} examples")
 
-print("\nDataset preparation complete.")
-print("Images:", len(training_images))
-print("Captions:", len(training_captions))
+    if len(training_images) >= NUM_SAMPLES:
+        break
 
-assert len(training_images) == NUM_SAMPLES
-assert len(training_captions) == NUM_SAMPLES
+print("\nDataset selection complete.")
+print("Rows scanned:", scanned_rows)
+print("Selected animal-focused images:", len(training_images))
+print("Selected captions:", len(training_captions))
 
-print("\nFirst three captions:")
+if len(training_images) != NUM_SAMPLES:
+    raise RuntimeError(
+        f"Expected {NUM_SAMPLES} matching examples; found "
+        f"{len(training_images)}. Do not continue training."
+    )
 
-for i, caption in enumerate(training_captions[:3], start=1):
-    print(f"{i}. {caption}")
+manifest_path = TRAINING_DIR / "custom_animal_subset_manifest.csv"
+with manifest_path.open("w", newline="", encoding="utf-8") as manifest_file:
+    writer = csv.DictWriter(
+        manifest_file,
+        fieldnames=["sample_index", "file_name", "caption", "subset"],
+    )
+    writer.writeheader()
+    for index, (file_name, caption) in enumerate(
+        zip(training_file_names, training_captions), start=1
+    ):
+        writer.writerow({
+            "sample_index": index,
+            "file_name": file_name,
+            "caption": caption,
+            "subset": "animal-focused Flickr8k training subset",
+        })
+
+print("Dataset manifest saved:", manifest_path)
+print("\nFirst three selected captions:")
+for index, caption in enumerate(training_captions[:3], start=1):
+    print(f"{index}. {caption}")
 
 
 # ============================================================
@@ -878,7 +943,7 @@ for i, prompt in enumerate(
 
     generator = torch.Generator(
         device=device
-    ).manual_seed(42 + i)
+    ).manual_seed(40 + i)
 
     with torch.inference_mode():
 

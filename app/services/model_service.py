@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import importlib.util
+import json
 import re
+import sys
 from collections import deque
 from pathlib import Path
 
@@ -39,6 +42,15 @@ TASK6_EMBEDDINGS_PATH = (
     / "cgan"
     / "task6_text_embeddings.pt"
 )
+
+# Task 5 cross-attention GAN artifacts ? separate from Task 6.
+TASK5_GAN_DIR = MODELS_DIR / "cgan" / "task5"
+TASK5_GENERATOR_PATH = TASK5_GAN_DIR / "task5_attention_generator.pth"
+TASK5_CONFIG_PATH = TASK5_GAN_DIR / "task5_attention_config.json"
+TASK5_MODEL_CODE_PATH = (
+    PROJECT_ROOT / "src" / "models" / "task5_attention_gan_model.py"
+)
+
 
 TASK1_LORA_PATH = (
     OUTPUTS_DIR
@@ -543,6 +555,8 @@ class ModelService:
         self.bert_model = None
 
         self.gan_generator = None
+        self.task5_attention_generator = None
+        self.task5_attention_config = None
 
         self.lora_loaded = False
 
@@ -1056,8 +1070,70 @@ class ModelService:
         }
 
     # ========================================================
-    # RESEARCH GAN
+    # TASK 5 RESEARCH GAN
     # ========================================================
+
+    def load_task5_attention_generator(self):
+        """Load the exact Task 5 attention generator and its config."""
+        if self.task5_attention_generator is not None:
+            return self.task5_attention_generator
+
+        for path in (
+            TASK5_GENERATOR_PATH,
+            TASK5_CONFIG_PATH,
+            TASK5_MODEL_CODE_PATH,
+        ):
+            if not path.is_file():
+                raise FileNotFoundError(
+                    f"Task 5 artifact not found: {path}"
+                )
+
+        config = json.loads(
+            TASK5_CONFIG_PATH.read_text(encoding="utf-8")
+        )
+        if config.get("architecture") != "AttentionGenerator":
+            raise RuntimeError(
+                "Unexpected Task 5 architecture in config: "
+                f"{config.get('architecture')!r}"
+            )
+
+        spec = importlib.util.spec_from_file_location(
+            "task5_attention_gan_model",
+            str(TASK5_MODEL_CODE_PATH),
+        )
+        if spec is None or spec.loader is None:
+            raise RuntimeError(
+                f"Could not import Task 5 model code: {TASK5_MODEL_CODE_PATH}"
+            )
+
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[spec.name] = module
+        spec.loader.exec_module(module)
+
+        generator = module.AttentionGenerator(
+            latent_dim=int(config["latent_dim"]),
+            text_dim=int(config["embedding_dim"]),
+            visual_dim=int(config["visual_dim"]),
+            attention_dim=int(config["attention_dim"]),
+        )
+
+        state = torch.load(
+            TASK5_GENERATOR_PATH,
+            map_location="cpu",
+            weights_only=True,
+        )
+        if isinstance(state, dict) and "state_dict" in state:
+            state = state["state_dict"]
+
+        # Strict loading prevents silent architecture/checkpoint mismatches.
+        generator.load_state_dict(state, strict=True)
+        generator = generator.to(self.device)
+        generator.eval()
+
+        self.task5_attention_config = config
+        self.task5_attention_generator = generator
+
+        return self.task5_attention_generator
 
     @torch.inference_mode()
     def generate_research(
@@ -1065,64 +1141,84 @@ class ModelService:
         prompt: str,
         seed: int = 42,
     ):
+        """Generate a 32x32 grayscale shape using the Task 5 checkpoint."""
+        generator = self.load_task5_attention_generator()
+        config = self.task5_attention_config
 
-        if not self.task6_available:
+        processed_text = preprocess_text(prompt)
+        tokenizer, bert = self.load_bert()
 
-            raise FileNotFoundError(
-                "Task 6 model artifacts are incomplete."
-            )
-
-        generator = (
-            self.load_task6_generator()
+        max_length = int(config["max_text_length"])
+        encoded = tokenizer(
+            processed_text,
+            return_tensors="pt",
+            padding="max_length",
+            truncation=True,
+            max_length=max_length,
         )
+        encoded = {
+            key: value.to(self.device)
+            for key, value in encoded.items()
+        }
 
-        processed_text, embedding = (
-            self.text_embedding(
-                prompt
-            )
-        )
+        # Task 5 was trained with token-level BERT features and a mask.
+        text_features = bert(**encoded).last_hidden_state
+        text_mask = encoded["attention_mask"]
 
-        torch.manual_seed(
-            int(seed)
-        )
-
-        if self.device.type == "cuda":
-
-            torch.cuda.manual_seed_all(
-                int(seed)
-            )
-
+        rng = torch.Generator(device=self.device).manual_seed(int(seed))
         latent = torch.randn(
             1,
-            LATENT_DIM,
+            int(config["latent_dim"]),
             device=self.device,
+            generator=rng,
         )
 
-        generated = generator(
+        result = generator(
             latent,
-            embedding,
+            text_features,
+            text_mask,
         )
+        if isinstance(result, (tuple, list)):
+            generated = result[0]
+            attention_weights = result[1] if len(result) > 1 else None
+        else:
+            generated = result
+            attention_weights = None
 
-        image, cleanup = (
-            clean_research_image(
-                generated,
-                prompt,
-            )
+        expected = (
+            1,
+            int(config["image_channels"]),
+            int(config["image_size"]),
+            int(config["image_size"]),
         )
+        if tuple(generated.shape) != expected:
+            raise RuntimeError(
+                f"Task 5 output shape mismatch: expected {expected}, "
+                f"received {tuple(generated.shape)}"
+            )
+        if not torch.isfinite(generated).all():
+            raise RuntimeError("Task 5 generated non-finite pixel values.")
+
+        # Correctly map the trained tanh range [-1, 1] to display range [0, 255].
+        pixels = generated[0, 0].detach().float().cpu().clamp(-1.0, 1.0)
+        pixels = ((pixels + 1.0) * 0.5 * 255.0).round()
+        array = pixels.to(torch.uint8).numpy()
+        image = Image.fromarray(array)
 
         return {
             "original_text": prompt,
             "processed_text": processed_text,
-            "embedding_shape": tuple(
-                embedding.shape
-            ),
+            "embedding_shape": tuple(text_features.shape),
             "image": image,
             "image_size": image.size,
             "seed": int(seed),
-            "device": str(
-                self.device
+            "device": str(self.device),
+            "shape_cleanup": "none ? direct Task 5 model output",
+            "attention_shape": (
+                tuple(attention_weights.shape)
+                if attention_weights is not None
+                else None
             ),
-            "shape_cleanup": cleanup,
         }
 
     # ========================================================

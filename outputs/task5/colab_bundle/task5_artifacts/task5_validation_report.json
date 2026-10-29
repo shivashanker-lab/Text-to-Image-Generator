@@ -1,0 +1,12 @@
+{
+  "checkpoint_reloaded_strictly": true,
+  "valid_output_dimensions": true,
+  "finite_pixels": true,
+  "minimum_per_prompt_condition_accuracy": 1.0,
+  "mean_shape_iou": 1.0,
+  "thresholds": {
+    "condition_accuracy_min": 0.9,
+    "mean_shape_iou_min": 0.75
+  },
+  "validation_pass": true
+}
