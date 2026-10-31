@@ -595,6 +595,7 @@ class ModelService:
             return self.sd_pipeline
 
         from diffusers import (
+            DPMSolverMultistepScheduler,
             StableDiffusionPipeline,
         )
 
@@ -604,13 +605,19 @@ class ModelService:
             else torch.float32
         )
 
+        # Load the model's configured safety checker for public-facing use.
         pipeline = (
             StableDiffusionPipeline
             .from_pretrained(
                 SD_MODEL_ID,
                 torch_dtype=dtype,
-                safety_checker=None,
             )
+        )
+
+        # Replace PNDM with the DPM multistep scheduler while preserving
+        # the scheduler configuration shipped with the Stable Diffusion model.
+        pipeline.scheduler = DPMSolverMultistepScheduler.from_config(
+            pipeline.scheduler.config
         )
 
         pipeline = pipeline.to(
