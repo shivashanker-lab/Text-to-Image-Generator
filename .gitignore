@@ -43,3 +43,14 @@ Thumbs.db
 # Task 5 artifacts required for the application and internship evidence
 !/models/cgan/task5/
 !/models/cgan/task5/**
+
+# Backup files - never publish
+*.backup*
+*.bak
+*.old
+*.orig
+*~
+
+# Editor and temporary files
+*.swp
+*.swo
