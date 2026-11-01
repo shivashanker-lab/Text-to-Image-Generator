@@ -1,0 +1,287 @@
+TEXT-TO-IMAGE GENERATION STUDIO
+PROJECT REPORT
+
+Internship: Data Science Internship
+Organization: ElevanceSkills
+
+
+1. INTRODUCTION
+
+For my Data Science internship, I worked on a project called "Text-to-Image Generation Studio".
+
+The main aim of this project is to understand how text and images can be connected using deep learning. The project explores how a model can use a text description as input in an image-generation process.
+
+During this project, I worked with different approaches, including pretrained text-to-image models with LoRA fine-tuning, Conditional GANs, text preprocessing, embeddings and attention-based GAN experiments.
+
+I also developed a Streamlit application to bring the available project components together through a simple interface.
+
+This project helped me understand both the theoretical and practical sides of deep learning. I learned how data is prepared, how models are tested and how different experiments can be organized into one project.
+
+
+2. PROJECT OBJECTIVES
+
+The main objectives of my project were:
+
+- To understand the basic concepts of text-to-image generation.
+- To work with image and caption datasets.
+- To prepare text captions for deep-learning models.
+- To understand text embeddings and their importance.
+- To experiment with Conditional GANs.
+- To study and implement attention mechanisms.
+- To explore LoRA fine-tuning with a pretrained model.
+- To compare different model approaches.
+- To build a Streamlit application.
+- To organize the project code, notebooks and model files properly.
+
+
+3. DATASET USED
+
+For this project, I used the Flickr8k dataset.
+
+Flickr8k contains approximately 8,000 images, with five captions for each image. These captions describe the content of the images and are useful for image-text experiments.
+
+The dataset version I downloaded contains three splits:
+
+Training: 6,000 examples
+Validation/Development: 1,000 examples
+Testing: 1,000 examples
+
+I downloaded the dataset using Hugging Face Datasets and saved it locally in Hugging Face format.
+
+After downloading, I loaded the saved dataset again to verify that it was available correctly. The verification showed all three splits with the expected number of examples.
+
+I selected this dataset because it provides image-caption pairs that are useful for understanding the relationship between text and images.
+
+Flickr8k is a relatively small dataset, so I used it for educational experiments and model development rather than claiming that it is enough to train a production-level text-to-image model from scratch.
+
+Dataset source:
+Flickr8k dataset from the University of Illinois.
+
+The dataset is provided for non-commercial research and educational use. Its original provider also gives specific instructions about redistribution, which should be followed.
+
+
+4. TECHNOLOGIES USED
+
+The main technologies and tools used in this project are:
+
+Python - Main programming language.
+PyTorch - Deep-learning models and tensor operations.
+Hugging Face Datasets - Dataset loading and saving.
+Transformers - Working with pretrained models.
+Diffusers - Pretrained diffusion model workflows.
+PEFT - Parameter-efficient fine-tuning and LoRA.
+NumPy - Numerical operations.
+Pandas - Data handling.
+Matplotlib - Graphs and visualizations.
+Pillow - Image processing.
+Streamlit - Application interface.
+Jupyter Notebook - Experiments and implementation.
+Git and GitHub - Version control and project sharing.
+
+
+5. PROJECT IMPLEMENTATION
+
+Task 1: Pretrained Text-to-Image Model and LoRA
+
+In this task, I explored pretrained text-to-image models and LoRA fine-tuning.
+
+LoRA is a parameter-efficient fine-tuning method. It allows selected additional parameters to be trained instead of updating the entire large model.
+
+I organized the experiment and saved the LoRA weights as project artifacts.
+
+During verification, the saved LoRA weights were checked. The verification found 256 tensors, and all values were finite.
+
+This task helped me understand how pretrained models can be adapted for a specific application.
+
+Task 2: Conditional Generative Adversarial Network
+
+In this task, I worked with a Conditional Generative Adversarial Network (CGAN).
+
+A GAN contains two main components:
+
+Generator - Creates generated samples.
+Discriminator - Learns to distinguish real samples from generated samples.
+
+A Conditional GAN also uses additional information, such as labels, to guide generation.
+
+I tested the CGAN model using a forward pass. The generator returned an output shape of (2, 1, 64, 64).
+
+This confirmed that the tested model forward pass was working correctly.
+
+Task 3: Text Preprocessing and Embeddings
+
+In this task, I worked on preparing text captions for deep-learning models.
+
+Text needs to be processed and converted into numerical representations before it can be used by neural networks.
+
+I explored text preprocessing and embeddings through the project notebook and supporting code.
+
+These steps are important because they help models work with the information provided in text descriptions.
+
+Task 4: Attention Mechanism
+
+In this task, I studied the attention mechanism and its role in deep learning.
+
+Attention helps a model focus on relevant parts of its input instead of treating every part equally.
+
+I worked through the attention mechanism notebook and saved the experiment outputs.
+
+This task helped me understand how attention can be used to improve the way a model processes information.
+
+Task 5: Baseline GAN and Attention-Based GAN
+
+In this task, I worked with baseline GAN and attention-based GAN models.
+
+The purpose was to understand the differences between these architectures and study how attention can be included in a GAN.
+
+The project contains generator and discriminator checkpoints for both model versions.
+
+It also includes validation images, experiment metrics and other supporting results.
+
+During verification, I successfully loaded and tested four checkpoints:
+
+- Attention generator
+- Baseline generator
+- Attention discriminator
+- Baseline discriminator
+
+Task 6: Integrated Text-to-Image Pipeline
+
+In this task, I worked on bringing the different project components together into an integrated pipeline.
+
+The project contains generator and discriminator checkpoints, saved text embeddings and training-loss arrays for this task.
+
+The Task 6 generator passed a forward-pass verification and returned an output shape of (2, 1, 64, 64).
+
+The supporting model and embedding files were also checked.
+
+The saved generator and discriminator loss arrays each contained 25 finite values.
+
+This task helped me understand how different components can be organized into one pipeline.
+
+
+6. STREAMLIT APPLICATION
+
+I developed the application interface using Streamlit.
+
+The application uses a model service to connect the interface with the available generation functionality.
+
+The project includes options for the internship LoRA and research workflows, together with availability checks for the relevant models.
+
+The main purpose of the application is to provide a simple interface through which the project components can be accessed.
+
+I also organized the application code into separate files so that the interface, configuration and model service are easier to maintain.
+
+
+7. PROJECT FOLDER STRUCTURE
+
+I organized the project into different folders to keep the code and output files properly arranged.
+
+app/
+Contains the Streamlit application, configuration and model service.
+
+src/
+Contains model implementations, data loading, text preprocessing and utility code.
+
+notebooks/
+Contains the notebooks for dataset analysis, preprocessing, CGAN, attention, fine-tuning and the integrated pipeline.
+
+models/
+Contains model definitions and saved model checkpoints.
+
+outputs/
+Contains generated images, comparisons, dataset summaries and experiment results.
+
+scripts/
+Contains scripts used to reproduce parts of the project.
+
+reports/
+Contains the project and internship reports.
+
+requirements.txt
+Contains the Python package requirements.
+
+README.md
+Contains the project overview and setup information.
+
+
+8. TESTING AND VERIFICATION
+
+After completing the main implementation work, I performed several checks to verify the project.
+
+The verification results included:
+
+- Python source compilation completed successfully for the app, src and scripts folders.
+- The dependency check reported no broken requirements.
+- Ten application and source modules were imported successfully.
+- Seven notebooks were checked for valid structure and saved outputs.
+- No saved execution errors were found in the notebook check.
+- The Task 1 LoRA weights were checked and contained 256 finite tensors.
+- The Task 2 CGAN passed its tested forward-pass check.
+- All four Task 5 model checkpoints loaded and passed their tested forward-pass checks.
+- The Task 6 generator passed its tested forward-pass check.
+- The Task 6 supporting model and embedding artifacts were readable.
+- The generator and discriminator loss arrays each contained 25 finite values.
+- The dataset summary and Task 5 validation artifacts were readable.
+- Git checks confirmed that backup, cache and virtual-environment files were not included among the tracked project files.
+
+Some notebooks contain partially executed cells. Therefore, I am reporting the specific checks and saved artifacts that were verified rather than claiming that every notebook was fully executed from beginning to end.
+
+
+9. PROJECT LIMITATIONS
+
+This project is an educational prototype and has some limitations.
+
+Flickr8k is a small dataset compared with the large datasets normally used by modern text-to-image systems.
+
+The GAN experiments use small image outputs and are mainly useful for understanding model architecture and training workflows.
+
+Training a high-quality text-to-image model from scratch requires much larger datasets, more computing resources and longer training time.
+
+The quality of generated images can also vary depending on the model, training data and text prompt.
+
+These limitations helped me understand the difference between an educational deep-learning experiment and a production-level image-generation system.
+
+
+10. CONCLUSION
+
+This project gave me practical experience with text and image data, deep-learning models and application development.
+
+I worked with pretrained models and LoRA, Conditional GANs, text preprocessing, embeddings, attention mechanisms and an integrated pipeline.
+
+I also learned how to organize source code, notebooks, model checkpoints and experiment outputs into a single project repository.
+
+The verification process helped me check important files and confirm that the tested model forward passes were working.
+
+Overall, this internship project improved my understanding of generative AI and the practical steps involved in developing a text-to-image application.
+
+It also helped me understand the importance of dataset preparation, model testing, project organization and documentation.
+
+
+11. PROJECT LINKS
+
+GitHub Repository:
+
+https://github.com/shivashanker-lab/Text-to-Image-Generator
+
+
+Google Drive Dataset Folder:
+
+https://drive.google.com/drive/folders/12_QkBN5Nji5PCR0SPdyDABqUFAoej7yB?usp=sharing
+
+
+12. REFERENCES
+
+1. Hodosh, M., Young, P. and Hockenmaier, J. (2013).
+Framing Image Description as a Ranking Task: Data, Models and Evaluation Metrics.
+Journal of Artificial Intelligence Research, Volume 47, pages 853-899.
+
+2. Flickr8k dataset information from the University of Illinois.
+
+3. Hugging Face Datasets documentation.
+
+4. PyTorch documentation.
+
+5. Hugging Face Transformers, Diffusers and PEFT documentation.
+
+6. Streamlit documentation.
